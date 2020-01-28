@@ -3,26 +3,26 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
-app.use((req, res, next) => {
-  ConsoleCount()
-  next()
-})
+
 
 let projects = []
 
-const ConsoleCount = () => {
-  return console.count('number request')
+const ConsoleCount = (req, res, next) => {
+  console.count('number request')
+  return next()
 }
 
 const CheckId = (req, res, next) => {
   const index = projects.findIndex(i => i.id == req.params.id)
   if (index < 0) {
-    return res.status(400).json({ error: 'User does not exists' })
+    return res.status(400).json({ error: 'Project not found' })
   }
   req.id = req.params.id
   req.index = index
   return next()
 }
+
+app.use(ConsoleCount)
 
 app.get('/projects', (req, res) => {
   return res.json(projects)
